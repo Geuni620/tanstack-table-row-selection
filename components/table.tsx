@@ -1,19 +1,15 @@
 import type { Row as TRow, Table as TTable } from '@tanstack/react-table';
 import {
-  ColumnFiltersState,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { ArrowUpDown } from 'lucide-react';
-import { useState } from 'react';
-import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -25,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useTableRowSelection } from '@/hook/useTableRowSelection';
 import { useToggleMutation } from '@/hook/useToggleMutation';
 
 interface ColumnDataProps {
@@ -50,10 +47,18 @@ type TableComponentsProps = {
 };
 
 export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
+  const initialRowSelection: Record<number, boolean> = {};
+  data.forEach((row) => {
+    if (row.done) {
+      initialRowSelection[row.id - 1] = row.done;
+    }
+  });
+
+  console.log('initialRowSelection', initialRowSelection);
+
+  const { rowSelection, setRowSelection, onRowSelectionChange } =
+    useTableRowSelection(initialRowSelection);
   const toggleMutation = useToggleMutation();
-  const [rowSelection, setRowSelection] = useState({});
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
 
   const columnHelper = createColumnHelper<ColumnDataProps>();
   const columns = [
@@ -120,14 +125,11 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    // onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: onRowSelectionChange,
 
     state: {
       rowSelection,
-      columnFilters,
-      sorting,
     },
 
     initialState: {
@@ -136,18 +138,6 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
       },
     },
   });
-
-  useEffect(() => {
-    const newSelectedRows: Record<number, boolean> = {};
-
-    data.forEach((row) => {
-      if (row.done) {
-        newSelectedRows[row.id - 1] = row.done;
-      }
-    });
-
-    setRowSelection(newSelectedRows);
-  }, [data]);
 
   return (
     <>
