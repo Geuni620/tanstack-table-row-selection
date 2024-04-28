@@ -56,7 +56,7 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
 
   console.log('initialRowSelection', initialRowSelection);
 
-  const { rowSelection, setRowSelection, onRowSelectionChange } =
+  const { rowSelection, onRowSelectionChange } =
     useTableRowSelection(initialRowSelection);
   const toggleMutation = useToggleMutation();
 
@@ -125,7 +125,6 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    // onRowSelectionChange: setRowSelection,
     onRowSelectionChange: onRowSelectionChange,
 
     state: {

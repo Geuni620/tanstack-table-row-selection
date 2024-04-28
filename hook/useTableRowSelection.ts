@@ -1,5 +1,4 @@
 import { OnChangeFn, type RowSelectionState } from '@tanstack/react-table';
-import { init } from 'next/dist/compiled/webpack/webpack';
 import { useState } from 'react';
 
 export const useTableRowSelection = (
@@ -7,12 +6,14 @@ export const useTableRowSelection = (
 ) => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  console.log('initialRowSelection', initialRowSelection);
+
   const value =
     Object.keys(rowSelection).length > 0 ? rowSelection : initialRowSelection;
 
   const onRowSelectionChange = (data: OnChangeFn<RowSelectionState>) => {
     if (typeof data === 'function') {
-      setRowSelection(data(value));
+      setRowSelection(data(value) as unknown as RowSelectionState);
     }
   };
 
