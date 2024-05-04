@@ -10,6 +10,7 @@ import {
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { ArrowUpDown } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -21,7 +22,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useTableRowSelection } from '@/hook/useTableRowSelection';
 import { useToggleMutation } from '@/hook/useToggleMutation';
 
 interface ColumnDataProps {
@@ -47,17 +47,7 @@ type TableComponentsProps = {
 };
 
 export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
-  const initialRowSelection: Record<number, boolean> = {};
-  data.forEach((row) => {
-    if (row.done) {
-      initialRowSelection[row.id - 1] = row.done;
-    }
-  });
-
-  console.log('initialRowSelection', initialRowSelection);
-
-  const { rowSelection, onRowSelectionChange } =
-    useTableRowSelection(initialRowSelection);
+  const [rowSelection, setRowSelection] = useState({});
   const toggleMutation = useToggleMutation();
 
   const columnHelper = createColumnHelper<ColumnDataProps>();
@@ -95,7 +85,6 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
           </div>
         );
       },
-
       cell: (props) => <p>{props.getValue()}</p>,
       size: 250,
     }),
@@ -125,18 +114,28 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onRowSelectionChange: onRowSelectionChange,
-
+    onRowSelectionChange: setRowSelection,
     state: {
       rowSelection,
     },
-
     initialState: {
       pagination: {
         pageSize: 20,
       },
     },
   });
+
+  useEffect(() => {
+    const newRowSelection = data.reduce<Record<number, boolean>>((acc, el) => {
+      if (el.done) {
+        acc[el.id] = el.done;
+      }
+
+      return acc;
+    }, {} as Record<number, boolean>);
+
+    setRowSelection(newRowSelection);
+  }, [data]);
 
   return (
     <>
