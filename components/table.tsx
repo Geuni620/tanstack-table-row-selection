@@ -1,4 +1,8 @@
-import type { Row as TRow, Table as TTable } from '@tanstack/react-table';
+import type {
+  Row as TRow,
+  RowSelectionState,
+  Table as TTable,
+} from '@tanstack/react-table';
 import {
   createColumnHelper,
   flexRender,
@@ -10,7 +14,7 @@ import {
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { ArrowUpDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -23,6 +27,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useToggleMutation } from '@/hook/useToggleMutation';
+import { createRowSelection } from '@/utils/createRowSelection';
 
 interface ColumnDataProps {
   id: number;
@@ -47,6 +52,10 @@ type TableComponentsProps = {
 };
 
 export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
+  const initialRowSelection = createRowSelection(data);
+  const initialRowSelectionRef = useRef<null | RowSelectionState>(
+    createRowSelection(data),
+  );
   const [rowSelection, setRowSelection] = useState({});
   const toggleMutation = useToggleMutation();
 
@@ -126,16 +135,22 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
   });
 
   useEffect(() => {
-    const newRowSelection = data.reduce<Record<number, boolean>>((acc, el) => {
-      if (el.done) {
-        acc[el.id] = el.done;
-      }
-
-      return acc;
-    }, {} as Record<number, boolean>);
-
+    const newRowSelection = createRowSelection(data);
     setRowSelection(newRowSelection);
   }, [data]);
+
+  // useEffect(() => {
+  //   initialRowSelectionRef.current = createRowSelection(data);
+  // }, [data]);
+
+  console.log(
+    'const',
+    initialRowSelection,
+    'ref',
+    initialRowSelectionRef.current,
+    'rowSelection',
+    rowSelection,
+  );
 
   return (
     <>

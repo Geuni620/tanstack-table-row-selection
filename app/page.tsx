@@ -20,6 +20,7 @@ export default function Home() {
     setSearchCondition(inputRef.current?.value || '');
     tableList.refetch();
   };
+  if (tableList.isLoading) return <div>Loading...</div>;
 
   return (
     <div className="h-screen w-screen">
@@ -35,7 +36,7 @@ export default function Home() {
             placeholder="Task name"
           />
         </form>
-        <TableComponents data={tableList.data?.list || []} />
+        <TableComponents data={tableList.data?.list} />
       </div>
     </div>
   );
