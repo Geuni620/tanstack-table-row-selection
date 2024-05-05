@@ -57,6 +57,16 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
     createRowSelection(data),
   );
   const [rowSelection, setRowSelection] = useState({});
+
+  const syncRowSelection = (
+    ref: React.MutableRefObject<RowSelectionState | null>,
+    rowSelection: RowSelectionState,
+  ) => {
+    if (ref && ref.current) {
+      ref.current = { ...rowSelection };
+    }
+  };
+
   const toggleMutation = useToggleMutation();
 
   const columnHelper = createColumnHelper<ColumnDataProps>();
@@ -202,7 +212,16 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
       </Table>
       <div className="flex w-full items-center justify-end p-2">
         <Button
-          onClick={() => toggleMutation.mutate({ selectedRow: rowSelection })}
+          onClick={() =>
+            toggleMutation.mutate(
+              { selectedRow: rowSelection },
+              {
+                onSuccess: () => {
+                  syncRowSelection(initialRowSelectionRef, rowSelection);
+                },
+              },
+            )
+          }
           className="mt-2 text-end"
         >
           Done!
