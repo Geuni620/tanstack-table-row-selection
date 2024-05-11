@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { ArrowUpDown } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -56,7 +56,7 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
   const initialRowSelectionRef = useRef<null | RowSelectionState>(
     createRowSelection(data),
   );
-  const [rowSelection, setRowSelection] = useState({});
+  const [rowSelection, setRowSelection] = useState(initialRowSelection);
 
   const syncRowSelection = (
     ref: React.MutableRefObject<RowSelectionState | null>,
@@ -66,7 +66,6 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
       ref.current = { ...rowSelection };
     }
   };
-
   const toggleMutation = useToggleMutation();
 
   const columnHelper = createColumnHelper<ColumnDataProps>();
@@ -133,7 +132,7 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onRowSelectionChange: setRowSelection,
+
     state: {
       rowSelection,
     },
@@ -142,25 +141,28 @@ export const TableComponents: React.FC<TableComponentsProps> = ({ data }) => {
         pageSize: 20,
       },
     },
+    onRowSelectionChange: setRowSelection,
   });
 
-  useEffect(() => {
-    const newRowSelection = createRowSelection(data);
-    setRowSelection(newRowSelection);
-  }, [data]);
+  // useEffect(() => {
+  //   const newRowSelection = createRowSelection(data);
+  //   setRowSelection(newRowSelection);
+  // }, [data]);
 
   // useEffect(() => {
   //   initialRowSelectionRef.current = createRowSelection(data);
   // }, [data]);
 
-  console.log(
-    'const',
-    initialRowSelection,
-    'ref',
-    initialRowSelectionRef.current,
-    'rowSelection',
-    rowSelection,
-  );
+  // console.log(
+  //   'const',
+  //   initialRowSelection,
+  //   'ref',
+  //   initialRowSelectionRef.current,
+  //   'rowSelection',
+  //   rowSelection,
+  // );
+
+  // console.log(table.getState().rowSelection);
 
   return (
     <>
